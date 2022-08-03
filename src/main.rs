@@ -24,6 +24,10 @@ async fn echo(req_body: String) -> impl Responder {
     HttpResponse::Ok().body(req_body)
 }
 
+async fn index() -> Result<NamedFile, Error> {
+    Ok(NamedFile::open("./src/static/index.html")?)
+}
+
 #[actix_web::main] // or #[tokio::main]
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
@@ -32,6 +36,7 @@ async fn main() -> std::io::Result<()> {
             .route("/hello", web::get().to(|| async { "Hello World!" }))
             .service(greet)
             .service(echo)
+            .route("/{_:.*}", web::get().to(index)) // all other routes
     })
     .bind(("127.0.0.1", 8080))?
     .run()
