@@ -3,7 +3,7 @@ use actix_web::{
     get, post, web, App, Error, HttpRequest, HttpResponse, HttpServer, Responder, Result,
 };
 use std::path::PathBuf;
-mod app_config;
+mod model;
 mod routes;
 
 #[get("/static/{filename:.*}")]
@@ -32,9 +32,10 @@ async fn index() -> Result<NamedFile, Error> {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    dotenv::dotenv().ok();
     HttpServer::new(|| {
         App::new()
-            .configure(app_config::config_app)
+            .configure(routes::router::binding)
             .service(serve_static_file)
             .route("/hello", web::get().to(|| async { "Hello World!" }))
             .service(greet)
