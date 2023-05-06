@@ -1,3 +1,4 @@
+mod html_generator;
 mod model;
 
 #[tokio::main]
@@ -8,5 +9,5 @@ async fn main() {
     //     "title": "Hello, world!",
     //     "content": "This is my first post!",
     // };
-    model::posts::get_posts().await;
+    html_generator::injector::inject(model::post::get_posts().await);
 }
