@@ -4,9 +4,16 @@ use mongodb::{bson::Document, Collection};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Post {
-    name: String,
+pub struct Post {
+    title: String,
     content: String,
+    author: String,
+    updated_at: String,
+    created_at: String,
+    tags: Vec<String>,
+    category: String,
+    view_count: i32,
+    like_count: i32,
 }
 
 pub async fn get_post_collection() -> Collection<Document> {
@@ -26,12 +33,14 @@ pub async fn add_post(document: Document) {
     return;
 }
 
-pub async fn get_posts() {
+pub async fn get_posts() -> Vec<Post> {
     let post_collection = get_post_collection().await;
     let mut cursor = post_collection.find(None, None).await.unwrap();
+    let mut posts: Vec<Post> = Vec::<Post>::new();
     while let Some(post_doc) = cursor.try_next().await.unwrap() {
         let post: Post = bson::from_document(post_doc).unwrap();
-        println!("title: {}", post.name);
+        println!("title: {}", post.title);
+        posts.push(post);
     }
-    return;
+    return posts;
 }
