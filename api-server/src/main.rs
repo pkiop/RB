@@ -3,6 +3,8 @@ use actix_web::{
     get, post, web, App, Error, HttpRequest, HttpResponse, HttpServer, Responder, Result,
 };
 use std::path::PathBuf;
+mod app_config;
+mod routes;
 
 #[get("/static/{filename:.*}")]
 async fn serve_static_file(req: HttpRequest) -> Result<NamedFile, Error> {
@@ -28,17 +30,18 @@ async fn index() -> Result<NamedFile, Error> {
     Ok(NamedFile::open("./src/static/index.html")?)
 }
 
-#[actix_web::main] // or #[tokio::main]
+#[actix_web::main]
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
+            .configure(app_config::config_app)
             .service(serve_static_file)
             .route("/hello", web::get().to(|| async { "Hello World!" }))
             .service(greet)
             .service(echo)
             .route("/{_:.*}", web::get().to(index)) // all other routes
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind(("127.0.0.1", 4000))?
     .run()
     .await
 }
