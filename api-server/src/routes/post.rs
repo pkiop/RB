@@ -15,5 +15,5 @@ async fn add_post(new_post: web::Json<Post>) -> Result<impl Responder> {
 }
 
 pub fn binding(cfg: &mut web::ServiceConfig) {
-    cfg.service(get_posts);
+    cfg.service(get_posts).service(add_post);
 }
