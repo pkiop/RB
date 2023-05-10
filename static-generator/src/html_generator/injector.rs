@@ -6,18 +6,21 @@ use std::io::Write;
 
 pub fn inject(posts: Vec<Post>) {
     let mut handlebars = Handlebars::new();
-    handlebars
-        .register_template_file("index", "src/html_generator/template.hbs")
-        .unwrap();
 
+    for post in posts {
+        let title = post.title.clone();
+        handlebars
+            .register_template_file(&title, "src/html_generator/template.hbs")
+            .unwrap();
 
-    let mut data = BTreeMap::new();
-    let title = "My Blog".to_string();
-    data.insert("title".to_string(), "My Blog".to_string());
-    data.insert("content".to_string(), "Hello, world!".to_string());
-    let result = handlebars.render("index", &data).unwrap();
+        let mut data = BTreeMap::new();
+        data.insert("title".to_string(), post.title);
+        data.insert("content".to_string(), post.content);
+        let result = handlebars.render(&title, &data).unwrap();
 
-    println!("injecting posts: {:?}", result);
-    let mut file = File::create(title + ".html").unwrap();
-    file.write_all(result.as_bytes()).unwrap()
+        println!("injecting posts: {:?}", result);
+        let filepath = "html/".to_string() + &title + ".html";
+        let mut file = File::create(filepath).unwrap();
+        file.write_all(result.as_bytes()).unwrap()
+    }
 }
