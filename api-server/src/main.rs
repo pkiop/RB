@@ -11,7 +11,6 @@ async fn serve_static_file(req: HttpRequest) -> Result<NamedFile, Error> {
     let path: PathBuf = req.match_info().query("filename").parse().unwrap();
     let mut file_path = String::from("./src/static/");
     file_path.push_str(path.to_str().unwrap_or(""));
-    println!("file_path is {file_path}");
     Ok(NamedFile::open(file_path)?)
 }
 
@@ -22,7 +21,6 @@ async fn greet(name: web::Path<String>) -> impl Responder {
 
 #[post("/echo")]
 async fn echo(req_body: String) -> impl Responder {
-    println!("echo start {}", req_body);
     HttpResponse::Ok().body(req_body)
 }
 
