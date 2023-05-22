@@ -6,6 +6,15 @@ use std::path::PathBuf;
 mod model;
 mod routes;
 
+#[get("/post/{filename}")]
+async fn serve_post_file(req: HttpRequest) -> Result<NamedFile, Error> {
+    let path: PathBuf = req.match_info().query("filename").parse().unwrap();
+    let mut file_path = String::from("./src/static/posts/");
+    file_path.push_str(path.to_str().unwrap_or(""));
+    file_path.push_str(".html");
+    Ok(NamedFile::open(file_path)?)
+}
+
 #[get("/static/{filename:.*}")]
 async fn serve_static_file(req: HttpRequest) -> Result<NamedFile, Error> {
     let path: PathBuf = req.match_info().query("filename").parse().unwrap();
@@ -34,8 +43,8 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
             .configure(routes::router::binding)
+            .service(serve_post_file)
             .service(serve_static_file)
-            .route("/hello", web::get().to(|| async { "Hello World!" }))
             .service(greet)
             .service(echo)
             .route("/{_:.*}", web::get().to(index)) // all other routes
